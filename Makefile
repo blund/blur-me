@@ -4,8 +4,4 @@ pre:
 train:
 	python train.py
 run:
-	python run.py
-predict:
-	python predict.py
-db:
-	python -i db.py
+	python main.py
