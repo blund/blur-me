@@ -14,12 +14,12 @@ data_dir = "detected-faces-test"
 
 image_height = 64
 image_width  = 64
-batch_size   = 128
+batch_size   = 512
 
 (train_ds, val_ds) = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     labels="inferred",
-    validation_split=0.3,
+    validation_split=0.2,
     subset="both",
     seed=123,
     color_mode='grayscale',
@@ -33,30 +33,35 @@ model = models.Sequential([
     layers.MaxPooling2D((2, 2)),
 
     layers.Conv2D(64, (3, 3), activation='relu',padding='same'),
+    layers.BatchNormalization(),
     layers.MaxPooling2D((2, 2)),
-    layers.BatchNormalization(),
-    layers.Dropout(0.25),
-
-    layers.Conv2D(128, (3, 3), activation='relu',padding='same'),
-    layers.MaxPooling2D((2, 2)),
-    layers.BatchNormalization(),
-    layers.Dropout(0.25),
-
-    layers.Conv2D(256, (4, 4), activation='relu',padding='same'),
-    layers.MaxPooling2D((2, 2)),
-    layers.BatchNormalization(),
-    layers.Dropout(0.25),
-
-    layers.Conv2D(512, (4, 4), activation='relu',padding='same'),
-    layers.BatchNormalization(),
     layers.Dropout(0.25),
 
     layers.Conv2D(128, (3, 3), activation='relu',padding='same'),
     layers.BatchNormalization(),
+    layers.MaxPooling2D((2, 2)),
     layers.Dropout(0.25),
-   
+
+    layers.Conv2D(256, (3, 3), activation='relu',padding='same'),
+    layers.BatchNormalization(),
+    layers.Conv2D(256, (3, 3), activation='relu',padding='same'),
+    layers.BatchNormalization(),
+    layers.MaxPooling2D((2, 2)),
+    layers.Dropout(0.25),
+
+    layers.Conv2D(512, (3, 3), activation='relu',padding='same'),
+    layers.BatchNormalization(),
+    layers.Conv2D(512, (3, 3), activation='relu',padding='same'),
+    layers.BatchNormalization(),
+    layers.Conv2D(512, (3, 3), activation='relu',padding='same'),
+    layers.BatchNormalization(),
+    layers.Conv2D(512, (3, 3), activation='relu',padding='same'),
+    layers.BatchNormalization(),
+    layers.Dropout(0.25),
+  
     layers.Flatten(),
-    layers.Dense(64, activation='relu'),
+    layers.Dropout(0.3),
+    layers.Dense(512, activation='relu'),
     layers.Dense(len(train_ds.class_names), activation='softmax')  # Adjust num_classes based on your dataset
 ])
 model.summary()
@@ -68,7 +73,7 @@ model.compile(optimizer='adam',
 history = model.fit(
   train_ds,
   validation_data=val_ds,
-  epochs=15
+  epochs=25
 )
 
 plt.plot(history.history['accuracy'], label='accuracy')
